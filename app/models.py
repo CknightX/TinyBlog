@@ -3,6 +3,8 @@ from flask_login import UserMixin
 from . import db, login_manager
 
 
+# 角色-用户
+
 class Role(db.Model):
     __tablename__ = 'roles'
     id = db.Column(db.Integer, primary_key=True)
