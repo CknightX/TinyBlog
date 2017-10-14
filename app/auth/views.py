@@ -4,7 +4,7 @@ from . import auth
 from .. import db
 from ..models import User
 from ..email import send_email
-from .forms import LoginForm,RegisterationForm
+from .forms import LoginForm,RegisterationForm,ChangePasswdForm
 
 #登录
 @auth.route('/login', methods=['GET', 'POST'])
@@ -27,7 +27,7 @@ def logout():
     flash('You have been logged out.')
     return redirect(url_for('main.index'))
 
-#注册
+#注册(需要验证邮箱) 
 @auth.route('/register',methods=['GET','POST'])
 def register():
     form=RegisterationForm()
@@ -44,6 +44,7 @@ def register():
 
 from flask.ext.login import current_user
 
+
 #验证链接
 @auth.route('/confirm/<token>')
 @login_required
@@ -55,7 +56,6 @@ def confirm(token):
     else:
         flash('The confirmation link is invalid or has expired.')
     return redirect(url_for('main.index'))
-
 
 
 #限制未登录的用户功能
@@ -84,3 +84,22 @@ def resend_confirmation():
     send_email(user.email,'Confirm Your Account','auth/email/confirm',user=user,token=token)
     flash('A confirmation email has been sent to you by email.')
     return redirect(url_for('main.index'))
+
+#修改密码
+@auth.route('/change_passwd',methods=['GET','POST'])
+@login_required
+def change_passwd():
+    form=ChangePasswdForm()
+    if form.validate_on_submit():
+        if form.old_passwd.data==form.new_passwd.data:
+            flash('old passwd is same to new passwd')
+        else:
+            if current_user.verify_password(form.old_passwd.data):
+                #更新表数据
+                current_user.password=form.new_passwd.data
+                db.session.add(current_user)
+                flash('Your password has been updated')
+                return redirect(url_for('main.index'))
+            else:
+                flash('old password is error')
+    return render_template('auth/change_passwd.html',form=form)

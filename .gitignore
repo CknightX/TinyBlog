@@ -3,4 +3,4 @@ __pycache__
 *.pyc
 *.sqlite
 tests/test_sql.py
-data.sqlite
+config.py

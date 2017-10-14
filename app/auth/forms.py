@@ -21,7 +21,12 @@ class RegisterationForm(FlaskForm):
 
     def validate_email(self,field):
         if User.query.filter_by(email=field.data).first():
-            raise ValidationError('Email already regustered.')
+            raise ValidationError('Email already registered.')
     def validate_username(self,field):
         if User.query.filter_by(username=field.data).first():
             raise ValidationError('Username already in use.')
+
+class ChangePasswdForm(FlaskForm):
+    old_passwd=StringField('Old password',validators=[Required()])
+    new_passwd=StringField('New password',validators=[Required()])
+    submit=SubmitField('Change')
